@@ -43,17 +43,18 @@ class RobotsCache(object):
         # a `requests.get`
         self.session = kwargs.pop('session', requests.Session())
         self.args = args
+        self.disallow_forbidden = kwargs.pop('disallow_forbidden', True)
         self.kwargs = kwargs
         # A mapping of hostnames to their robots.txt rules
         self._cache = {}
 
-    def find(self, url, fetch_if_missing=False):
+    def find(self, url, fetch_if_missing=False, honor_ttl=True):
         '''Finds the rules associated with the particular url. Optionally, it
         can fetch the rules if they are missing.'''
         canonical = Utility.hostname(url)
         cached = self._cache.get(canonical)
         # If it's expired, we should get rid of it
-        if cached and cached.expired:
+        if honor_ttl and cached and cached.expired:
             del self._cache[canonical]
             cached = None
         # Should we fetch it if it's missing?
@@ -73,13 +74,14 @@ class RobotsCache(object):
         '''
         try:
             # First things first, fetch the thing
-            robots_url = 'http://%s/robots.txt' % Utility.hostname(url)
+            robots_url = Utility.roboturl(url)
             logger.debug('Fetching %s' % robots_url)
             req = self.session.get(robots_url, *args, **kwargs)
             ttl = max(self.min_ttl, Utility.get_ttl(req.headers, self.default_ttl))
             # And now parse the thing and return it
             return parser.Rules(robots_url, req.status_code, req.content,
-                time.time() + ttl)
+                                time.time() + ttl,
+                                disallow_forbidden=self.disallow_forbidden)
         except Exception as exc:
             raise exceptions.ServerError(exc)
 
