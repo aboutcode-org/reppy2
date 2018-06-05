@@ -1,14 +1,18 @@
 language: python
+dist: trusty
 
 python:
-  - "3.4"
-  - "3.3"
   - "2.7"
-  - "pypy"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7-dev"
 
-install:
-  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then travis_retry pip install -r dev-requirements.txt; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then travis_retry pip install -r dev-requirements-py3.txt; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 'pypy' ]]; then travis_retry pip install -r dev-requirements-py3.txt; fi
+matrix:
+  allow_failures:
+    - python: "3.7-dev"
+
+install: pip install -r dev-requirements.txt
 
 script: make test

@@ -1,12 +1,16 @@
+.PHONY: test
+test: reppy/robots.so
+	nosetests --with-coverage tests
+
+reppy/%.so: reppy/%.py* reppy/rep-cpp/src/* reppy/rep-cpp/include/* reppy/rep-cpp/deps/url-cpp/include/* reppy/rep-cpp/deps/url-cpp/src/*
+	python setup.py build_ext --inplace
+
+install:
+	python setup.py install
+
+dev-requirements:
+	pip freeze | grep -v -e reppy > dev-requirements.txt
+
 clean:
-	# Remove the build
-	sudo rm -rf build dist
-	# And all of our pyc files
-	find . -name '*.pyc' | xargs -n 100 rm
-	# And lastly, .coverage files
-	find . -name .coverage | xargs rm
-
-nose:
-	nosetests --exe --cover-package=reppy --with-coverage --cover-branches -v
-
-test: nose
+	rm -rf build dist *.egg-info reppy/*.so
+	find . -name '*.pyc' | xargs --no-run-if-empty rm

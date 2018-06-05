@@ -28,11 +28,30 @@ class ReppyException(Exception):
     '''Any internal exception'''
     pass
 
+class ContentTooLong(ReppyException):
+    '''Robots.txt content is too long.'''
+    pass
+
 class ServerError(ReppyException):
     '''When the remote server returns an error'''
-    def __init__(self, *args, **kwargs):
-        self.status = kwargs.get('status')
-        if self.status is None and len(args) >= 2:
-            self.status = args[1]
-        ReppyException.__init__(self, *args, **kwargs)
+    pass
 
+class SSLException(ReppyException):
+    '''An SSL error.'''
+    pass
+
+class ConnectionException(ReppyException):
+    '''A connection error exception.'''
+    pass
+
+class MalformedUrl(ReppyException):
+    '''An exception for a missing or invalid url or schema.'''
+    pass
+
+class ExcessiveRedirects(ReppyException):
+    '''A TooManyRedirects error.'''
+    pass
+
+class BadStatusCode(ReppyException):
+    '''An exception for 5xx status codes.'''
+    pass
