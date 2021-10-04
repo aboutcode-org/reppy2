@@ -37,7 +37,7 @@ Sitemaps, Allow, and Crawl-delay. Main features:
 - Configurable user agent for fetching robots.txt
 - Automatic refetching basing on expiration
 
-This is a patched fork of the last pure Python version that 
+This is a patched fork of the last pure Python version that
 works on Python 2 and 3.
 ''',
     author           = 'Dan Lecocq',
@@ -50,7 +50,6 @@ works on Python 2 and 3.
     ],
     install_requires = [
         'python-dateutil',
-        'url',
         'requests'
     ],
     classifiers      = [
