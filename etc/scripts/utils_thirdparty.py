@@ -1845,7 +1845,8 @@ class Cache:
         if not os.path.exists(cached):
             content = get_file_content(path_or_url=path_or_url, as_text=as_text)
             wmode = 'w' if as_text else 'wb'
-            with open(cached, wmode, encoding="utf-8") as fo:
+            encoding = 'utf-8' if as_text else None
+            with open(cached, wmode, encoding=encoding) as fo:
                 fo.write(content)
             return content
         else:
