@@ -1,14 +1,18 @@
+# See https://config.travis-ci.com/ for a full list of configuration options.
+
+os: linux
+
+dist: xenial
+
 language: python
-
 python:
-  - "3.4"
-  - "3.3"
-  - "2.7"
-  - "pypy"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9"
 
-install:
-  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then travis_retry pip install -r dev-requirements.txt; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then travis_retry pip install -r dev-requirements-py3.txt; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 'pypy' ]]; then travis_retry pip install -r dev-requirements-py3.txt; fi
+# Scripts to run at install stage
+install: ./configure --dev
 
-script: make test
+# Scripts to run at script stage
+script: venv/bin/pytest
