@@ -3,7 +3,6 @@
 from __future__ import print_function
 
 from contextlib import contextmanager
-import sys
 import time
 
 from reppy.cache import RobotsCache
@@ -15,7 +14,7 @@ Allow: /
 '''
 
 cache = RobotsCache()
-cache.add(Rules('http://example.com/', 200, content, sys.maxint))
+cache.add(Rules('http://example.com/', 200, content, float('inf')))
 
 @contextmanager
 def timer(count):
@@ -30,5 +29,5 @@ def timer(count):
         print(' Rate: %s' % (count / duration))
 
 with timer(100000) as count:
-    for _ in xrange(count):
+    for _ in range(count):
         cache.allowed('http://example.com/page', 'agent')

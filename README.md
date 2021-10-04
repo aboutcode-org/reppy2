@@ -163,15 +163,10 @@ Path matching supports both `*` and `$`
 
 Running Tests
 =============
-In order to run tests, you'll need `nose`, `asis`, `gevent` and `coverage`, all
-of which can be installed with `pip`:
+In order to run tests, run:
 
 ```bash
-sudo pip install -r dev-requirements.txt
-```
-
-From there, the tests may be run with:
-
-```bash
-make test
+./configure --dev
+source venv/bin/activate
+py.test -vvs .
 ```
