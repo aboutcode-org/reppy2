@@ -25,7 +25,7 @@ from setuptools import setup
 
 setup(
     name             = 'reppy2',
-    version          = '0.3.5',
+    version          = '0.3.6',
     description      = 'Replacement robots.txt Parser in pure Python',
     long_description = '''Replaces the built-in robotsparser with a
 RFC-conformant implementation that supports modern robots.txt constructs like
