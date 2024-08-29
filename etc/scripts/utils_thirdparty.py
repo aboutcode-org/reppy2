@@ -5,7 +5,7 @@
 # ScanCode is a trademark of nexB Inc.
 # SPDX-License-Identifier: Apache-2.0
 # See http://www.apache.org/licenses/LICENSE-2.0 for the license text.
-# See https://github.com/nexB/skeleton for support or download.
+# See https://github.com/aboutcode-org/skeleton for support or download.
 # See https://aboutcode.org for more information about nexB OSS projects.
 #
 from collections import defaultdict
@@ -89,10 +89,10 @@ TRACE = False
 PYTHON_VERSIONS = '36', '37', '38', '39',
 
 ABIS_BY_PYTHON_VERSION = {
-    '36':['cp36', 'cp36m'],
-    '37':['cp37', 'cp37m'],
-    '38':['cp38', 'cp38m'],
-    '39':['cp39', 'cp39m'],
+    '36': ['cp36', 'cp36m'],
+    '37': ['cp37', 'cp37m'],
+    '38': ['cp38', 'cp38m'],
+    '39': ['cp39', 'cp39m'],
 }
 
 PLATFORMS_BY_OS = {
@@ -543,21 +543,25 @@ class Distribution(NameVer):
         """
         # We can only create from a dist of the same package
         has_same_key_fields = all(data.get(kf) == getattr(dist, kf, None)
-            for kf in ('type', 'namespace', 'name')
-        )
+                                  for kf in ('type', 'namespace', 'name')
+                                  )
         if not has_same_key_fields:
-            print(f'Missing key fields: Cannot derive a new dist from data: {data} and dist: {dist}')
+            print(
+                f'Missing key fields: Cannot derive a new dist from data: {data} and dist: {dist}')
             return
 
-        has_key_field_values = all(data.get(kf) for kf in ('type', 'name', 'version'))
+        has_key_field_values = all(data.get(kf)
+                                   for kf in ('type', 'name', 'version'))
         if not has_key_field_values:
-            print(f'Missing key field values: Cannot derive a new dist from data: {data} and dist: {dist}')
+            print(
+                f'Missing key field values: Cannot derive a new dist from data: {data} and dist: {dist}')
             return
 
         data = dict(data)
         # do not overwrite the data with the other dist
         # only supplement
-        data.update({k: v for k, v in dist.get_updatable_data().items() if not data.get(k)})
+        data.update(
+            {k: v for k, v in dist.get_updatable_data().items() if not data.get(k)})
         return cls.from_data(data)
 
     @classmethod
@@ -677,7 +681,7 @@ class Distribution(NameVer):
         """
         Return a mapping data from this distribution.
         """
-        return {k: v for k, v in  attr.asdict(self).items() if v}
+        return {k: v for k, v in attr.asdict(self).items() if v}
 
     def save_about_and_notice_files(self, dest_dir=THIRDPARTY_DIR):
         """
@@ -692,7 +696,8 @@ class Distribution(NameVer):
                 if existing_content == content:
                     return False
 
-            if TRACE: print(f'Saving ABOUT (and NOTICE) files for: {self}')
+            if TRACE:
+                print(f'Saving ABOUT (and NOTICE) files for: {self}')
             wmode = 'wb' if isinstance(content, bytes) else 'w'
             with open(location, wmode, encoding="utf-8") as fo:
                 fo.write(content)
@@ -761,7 +766,8 @@ class Distribution(NameVer):
         NOTICE file if any. Return True if the data was updated.
         """
         try:
-            about_text = fetch_content_from_path_or_url_through_cache(self.about_download_url)
+            about_text = fetch_content_from_path_or_url_through_cache(
+                self.about_download_url)
         except RemoteNotFetchedException:
             return False
 
@@ -772,11 +778,13 @@ class Distribution(NameVer):
         notice_file = about_data.pop('notice_file', None)
         if notice_file:
             try:
-                notice_text = fetch_content_from_path_or_url_through_cache(self.notice_download_url)
+                notice_text = fetch_content_from_path_or_url_through_cache(
+                    self.notice_download_url)
                 if notice_text:
                     about_data['notice_text'] = notice_text
             except RemoteNotFetchedException:
-                print(f'Failed to fetch NOTICE file: {self.notice_download_url}')
+                print(
+                    f'Failed to fetch NOTICE file: {self.notice_download_url}')
         return self.load_about_data(about_data)
 
     def get_checksums(self, dest_dir=THIRDPARTY_DIR):
@@ -818,7 +826,8 @@ class Distribution(NameVer):
 
     def get_license_keys(self):
         try:
-            keys = LICENSING.license_keys(self.license_expression, unique=True, simple=True)
+            keys = LICENSING.license_keys(
+                self.license_expression, unique=True, simple=True)
         except license_expression.ExpressionParseError:
             return ['unknown']
         return keys
@@ -830,11 +839,12 @@ class Distribution(NameVer):
         """
         paths_or_urls = get_remote_repo().links
         errors = []
-        extra_lic_names = [l.get('file') for l in self.extra_data.get('licenses', {})]
+        extra_lic_names = [l.get('file')
+                           for l in self.extra_data.get('licenses', {})]
         extra_lic_names += [self.extra_data.get('license_file')]
-        extra_lic_names = [ln for ln in extra_lic_names  if ln]
-        lic_names = [ f'{key}.LICENSE' for key in self.get_license_keys()]
-        for filename  in lic_names + extra_lic_names:
+        extra_lic_names = [ln for ln in extra_lic_names if ln]
+        lic_names = [f'{key}.LICENSE' for key in self.get_license_keys()]
+        for filename in lic_names + extra_lic_names:
             floc = os.path.join(dest_dir, filename)
             if os.path.exists(floc):
                 continue
@@ -850,7 +860,8 @@ class Distribution(NameVer):
                     path_or_url=lic_url,
                     as_text=True,
                 )
-                if TRACE: print(f'Fetched license from remote: {lic_url}')
+                if TRACE:
+                    print(f'Fetched license from remote: {lic_url}')
 
             except:
                 try:
@@ -862,7 +873,8 @@ class Distribution(NameVer):
                         path_or_url=lic_url,
                         as_text=True,
                     )
-                    if TRACE: print(f'Fetched license from licensedb: {lic_url}')
+                    if TRACE:
+                        print(f'Fetched license from licensedb: {lic_url}')
 
                 except:
                     msg = f'No text for license {filename} in expression "{self.license_expression}" from {self}'
@@ -900,12 +912,15 @@ class Distribution(NameVer):
 
         classifiers = raw_data.get_all('Classifier') or []
 
-        declared_license = [raw_data['License']] + [c for c in classifiers if c.startswith('License')]
-        license_expression = compute_normalized_license_expression(declared_license)
-        other_classifiers = [c for c in classifiers if not c.startswith('License')]
+        declared_license = [raw_data['License']] + \
+            [c for c in classifiers if c.startswith('License')]
+        license_expression = compute_normalized_license_expression(
+            declared_license)
+        other_classifiers = [
+            c for c in classifiers if not c.startswith('License')]
 
         holder = raw_data['Author']
-        holder_contact=raw_data['Author-email']
+        holder_contact = raw_data['Author-email']
         copyright = f'Copyright (c) {holder} <{holder_contact}>'
 
         pkginfo_data = dict(
@@ -947,7 +962,8 @@ class Distribution(NameVer):
         package_url = data.get('package_url')
         if package_url:
             purl_from_data = packageurl.PackageURL.from_string(package_url)
-            purl_from_self = packageurl.PackageURL.from_string(self.package_url)
+            purl_from_self = packageurl.PackageURL.from_string(
+                self.package_url)
             if purl_from_data != purl_from_self:
                 print(
                     f'Invalid dist update attempt, no same same purl with dist: '
@@ -1162,7 +1178,7 @@ class Wheel(Distribution):
         Return True if this wheel is compatible with the Environment
         `environment`.
         """
-        return  not self.is_supported_by_tags(environment.tags)
+        return not self.is_supported_by_tags(environment.tags)
 
     def to_filename(self):
         """
@@ -1384,7 +1400,8 @@ class PypiPackage(NameVer):
         if version is None:
             return cls.get_latest_version(name, packages)
 
-        nvs = [p for p in cls.get_versions(name, packages) if p.version == version]
+        nvs = [p for p in cls.get_versions(
+            name, packages) if p.version == version]
 
         if not nvs:
             return
@@ -1440,14 +1457,16 @@ class PypiPackage(NameVer):
         """
         if self.sdist:
             assert self.sdist.filename
-            if TRACE: print('Fetching source for package:', self.name, self.version)
+            if TRACE:
+                print('Fetching source for package:', self.name, self.version)
             fetch_and_save_path_or_url(
                 filename=self.sdist.filename,
                 dest_dir=dest_dir,
                 path_or_url=self.sdist.path_or_url,
                 as_text=False,
             )
-            if TRACE: print(' --> file:', self.sdist.filename)
+            if TRACE:
+                print(' --> file:', self.sdist.filename)
             return self.sdist.filename
         else:
             print(f'Missing sdist for: {self.name}=={self.version}')
@@ -1505,7 +1524,8 @@ class PypiPackage(NameVer):
         ... ]
         >>> assert expected == result
         """
-        installable = [f for f in paths_or_urls if f.endswith(EXTENSIONS_INSTALLABLE)]
+        installable = [f for f in paths_or_urls if f.endswith(
+            EXTENSIONS_INSTALLABLE)]
         for path_or_url in installable:
             try:
                 yield Distribution.from_path_or_url(path_or_url)
@@ -1558,7 +1578,8 @@ class Environment:
     implementation = attr.ib(
         type=str,
         default='cp',
-        metadata=dict(help='Python implementation supported by this environment.'),
+        metadata=dict(
+            help='Python implementation supported by this environment.'),
     )
 
     abis = attr.ib(
@@ -1570,7 +1591,8 @@ class Environment:
     platforms = attr.ib(
         type=list,
         default=attr.Factory(list),
-        metadata=dict(help='List of platform tags supported by this environment.'),
+        metadata=dict(
+            help='List of platform tags supported by this environment.'),
     )
 
     @classmethod
@@ -1626,15 +1648,15 @@ class Repository:
     packages_by_normalized_name = attr.ib(
         type=dict,
         default=attr.Factory(lambda: defaultdict(list)),
-        metadata=dict(help=
-            'Mapping of {package name: [package objects]} available in this repo'),
+        metadata=dict(
+            help='Mapping of {package name: [package objects]} available in this repo'),
     )
 
     packages_by_normalized_name_version = attr.ib(
         type=dict,
         default=attr.Factory(dict),
-        metadata=dict(help=
-            'Mapping of {(name, version): package object} available in this repo'),
+        metadata=dict(
+            help='Mapping of {(name, version): package object} available in this repo'),
     )
 
     def get_links(self, *args, **kwargs):
@@ -1686,7 +1708,8 @@ class LinksRepository(Repository):
             for p in PypiPackage.packages_from_many_paths_or_urls(paths_or_urls=self.links):
                 normalized_name = p.normalized_name
                 self.packages_by_normalized_name[normalized_name].append(p)
-                self.packages_by_normalized_name_version[(normalized_name, p.version)] = p
+                self.packages_by_normalized_name_version[(
+                    normalized_name, p.version)] = p
 
     def get_links(self, *args, **kwargs):
         return self.links or []
@@ -1717,7 +1740,8 @@ class PypiRepository(Repository):
     links_by_normalized_name = attr.ib(
         type=dict,
         default=attr.Factory(lambda: defaultdict(list)),
-        metadata=dict(help='Mapping of {package name: [links]} available in this repo'),
+        metadata=dict(
+            help='Mapping of {package name: [links]} available in this repo'),
     )
 
     def _fetch_links(self, name):
@@ -1732,7 +1756,8 @@ class PypiRepository(Repository):
         links = self._fetch_links(name)
         self.links_by_normalized_name[name] = links
 
-        packages = list(PypiPackage.packages_from_many_paths_or_urls(paths_or_urls=links))
+        packages = list(
+            PypiPackage.packages_from_many_paths_or_urls(paths_or_urls=links))
         self.packages_by_normalized_name[name] = packages
 
         for p in packages:
@@ -1742,7 +1767,7 @@ class PypiRepository(Repository):
     def get_links(self, name, *args, **kwargs):
         name = name and NameVer.normalize_name(name)
         self._populate_links_and_packages(name)
-        return  self.links_by_normalized_name.get(name, [])
+        return self.links_by_normalized_name.get(name, [])
 
     def get_versions(self, name):
         name = name and NameVer.normalize_name(name)
@@ -1843,7 +1868,8 @@ class Cache:
         cached = os.path.join(self.directory, filename)
 
         if not os.path.exists(cached):
-            content = get_file_content(path_or_url=path_or_url, as_text=as_text)
+            content = get_file_content(
+                path_or_url=path_or_url, as_text=as_text)
             wmode = 'w' if as_text else 'wb'
             encoding = 'utf-8' if as_text else None
             with open(cached, wmode, encoding=encoding) as fo:
@@ -1868,13 +1894,15 @@ def get_file_content(path_or_url, as_text=True):
     remote URL. Return the content as bytes is `as_text` is False.
     """
     if (path_or_url.startswith('file://')
-        or (path_or_url.startswith('/') and os.path.exists(path_or_url))
-    ):
+            or (path_or_url.startswith('/') and os.path.exists(path_or_url))
+        ):
         return get_local_file_content(path=path_or_url, as_text=as_text)
 
     elif path_or_url.startswith('https://'):
-        if TRACE: print(f'Fetching: {path_or_url}')
-        _headers, content = get_remote_file_content(url=path_or_url, as_text=as_text)
+        if TRACE:
+            print(f'Fetching: {path_or_url}')
+        _headers, content = get_remote_file_content(
+            url=path_or_url, as_text=as_text)
         return content
 
     else:
@@ -1928,7 +1956,8 @@ def get_remote_file_content(url, as_text=True, headers_only=False, headers=None,
                 )
 
             else:
-                raise RemoteNotFetchedException(f'Failed HTTP request from {url} with {status}')
+                raise RemoteNotFetchedException(
+                    f'Failed HTTP request from {url} with {status}')
 
         if headers_only:
             return response.headers, None
@@ -1963,7 +1992,8 @@ def get_url_content_if_modified(url, md5, _delay=0,):
             return None
 
         elif status != requests.codes.ok:  # NOQA
-            raise RemoteNotFetchedException(f'Failed HTTP request from {url} with {status}')
+            raise RemoteNotFetchedException(
+                f'Failed HTTP request from {url} with {status}')
 
         return response.content
 
@@ -2024,9 +2054,11 @@ def fetch_and_save_path_or_url(filename, dest_dir, path_or_url, as_text=True, th
     text if as_text is True otherwise as treat as binary.
     """
     if through_cache:
-        content = fetch_content_from_path_or_url_through_cache(path_or_url, as_text)
+        content = fetch_content_from_path_or_url_through_cache(
+            path_or_url, as_text)
     else:
-        content = fetch_content_from_path_or_url_through_cache(path_or_url, as_text, cache=None)
+        content = fetch_content_from_path_or_url_through_cache(
+            path_or_url, as_text, cache=None)
 
     output = os.path.join(dest_dir, filename)
     wmode = 'w' if as_text else 'wb'
@@ -2054,7 +2086,8 @@ def fetch_missing_sources(dest_dir=THIRDPARTY_DIR):
 
     for package in local_packages:
         if not package.sdist:
-            print(f'Finding sources for: {package.name}=={package.version}: ', end='')
+            print(
+                f'Finding sources for: {package.name}=={package.version}: ', end='')
             try:
                 pypi_package = pypi_repo.get_package(
                     name=package.name, version=package.version)
@@ -2188,7 +2221,8 @@ def find_links_from_dir(directory=THIRDPARTY_DIR):
     any of the extension in the list of `extensions` strings.
     """
     base = os.path.abspath(directory)
-    files = [os.path.join(base, f) for f in os.listdir(base) if f.endswith(EXTENSIONS)]
+    files = [os.path.join(base, f)
+             for f in os.listdir(base) if f.endswith(EXTENSIONS)]
     return files
 
 
@@ -2201,14 +2235,16 @@ def find_links_from_release_url(links_url=REMOTE_LINKS_URL):
     URL that starts with the `prefix` string and ends with any of the extension
     in the list of `extensions` strings. Use the `base_url` to prefix the links.
     """
-    if TRACE: print(f'Finding links for {links_url}')
+    if TRACE:
+        print(f'Finding links for {links_url}')
 
     plinks_url = urllib.parse.urlparse(links_url)
 
     base_url = urllib.parse.SplitResult(
         plinks_url.scheme, plinks_url.netloc, '', '', '').geturl()
 
-    if TRACE: print(f'Base URL {base_url}')
+    if TRACE:
+        print(f'Base URL {base_url}')
 
     _headers, text = get_remote_file_content(links_url)
     links = []
@@ -2230,11 +2266,13 @@ def find_links_from_release_url(links_url=REMOTE_LINKS_URL):
             # relative link
             url = f'{links_url}/{link}'
 
-        if TRACE: print(f'Adding URL: {url}')
+        if TRACE:
+            print(f'Adding URL: {url}')
 
         links.append(url)
 
-    if TRACE: print(f'Found {len(links)} links at {links_url}')
+    if TRACE:
+        print(f'Found {len(links)} links at {links_url}')
     return links
 
 
@@ -2243,7 +2281,8 @@ def find_pypi_links(name, simple_url=PYPI_SIMPLE_URL):
     Return a list of download link URLs found in a PyPI simple index for package name.
     with the list of `extensions` strings. Use the `simple_url` PyPI url.
     """
-    if TRACE: print(f'Finding links for {simple_url}')
+    if TRACE:
+        print(f'Finding links for {simple_url}')
 
     name = name and NameVer.normalize_name(name)
     simple_url = simple_url.strip('/')
@@ -2255,7 +2294,7 @@ def find_pypi_links(name, simple_url=PYPI_SIMPLE_URL):
     links = [l.partition('#sha256=') for l in links]
     links = [url for url, _, _sha256 in links]
     links = [l for l in links if l.endswith(EXTENSIONS)]
-    return  links
+    return links
 
 
 def get_link_for_filename(filename, paths_or_urls):
@@ -2268,7 +2307,8 @@ def get_link_for_filename(filename, paths_or_urls):
     if not path_or_url:
         raise Exception(f'Missing link to file: {filename}')
     if not len(path_or_url) == 1:
-        raise Exception(f'Multiple links to file: {filename}: \n' + '\n'.join(path_or_url))
+        raise Exception(
+            f'Multiple links to file: {filename}: \n' + '\n'.join(path_or_url))
     return path_or_url[0]
 
 ################################################################################
@@ -2293,19 +2333,21 @@ def get_required_packages(required_name_versions):
     remote_repo = get_remote_repo()
 
     remote_packages = {(name, version): remote_repo.get_package(name, version)
-        for name, version in required_name_versions}
+                       for name, version in required_name_versions}
 
     pypi_repo = get_pypi_repo()
     pypi_packages = {(name, version):  pypi_repo.get_package(name, version)
-        for name, version in required_name_versions}
+                     for name, version in required_name_versions}
 
     # remove any empty package (e.g. that do not exist in some place)
     remote_packages = {nv: p for nv, p in remote_packages.items() if p}
     pypi_packages = {nv: p for nv, p in pypi_packages.items() if p}
 
     # check that we are not missing any
-    repos_name_versions = set(remote_packages.keys()) | set(pypi_packages.keys())
-    missing_name_versions = required_name_versions.difference(repos_name_versions)
+    repos_name_versions = set(remote_packages.keys()
+                              ) | set(pypi_packages.keys())
+    missing_name_versions = required_name_versions.difference(
+        repos_name_versions)
     if missing_name_versions:
         raise MissingRequirementException(sorted(missing_name_versions))
 
@@ -2360,11 +2402,13 @@ def update_requirements(name, version=None, requirements_file='requirements.txt'
         if normalized_name == existing_normalized_name:
             if version != existing_version:
                 is_updated = True
-            updated_name_versions.append((existing_normalized_name, existing_version,))
+            updated_name_versions.append(
+                (existing_normalized_name, existing_version,))
 
     if is_updated:
         updated_name_versions = sorted(updated_name_versions)
-        nvs = '\n'.join(f'{name}=={version}' for name, version in updated_name_versions)
+        nvs = '\n'.join(f'{name}=={version}' for name,
+                        version in updated_name_versions)
 
         with open(requirements_file, 'w', encoding="utf-8") as fo:
             fo.write(nvs)
@@ -2452,7 +2496,8 @@ def add_fetch_or_update_about_and_license_files(dest_dir=THIRDPARTY_DIR, include
 
             latest_local_version = other_local_packages and other_local_packages[-1]
             if latest_local_version:
-                latest_local_dists = list(latest_local_version.get_distributions())
+                latest_local_dists = list(
+                    latest_local_version.get_distributions())
                 for latest_local_dist in latest_local_dists:
                     latest_local_dist.load_about_data(dest_dir=dest_dir)
                     if not latest_local_dist.has_key_metadata():
@@ -2502,7 +2547,8 @@ def add_fetch_or_update_about_and_license_files(dest_dir=THIRDPARTY_DIR, include
 
                     # if has key data we may look to improve later, but we can move on
                     if local_dist.has_key_metadata():
-                        local_dist.save_about_and_notice_files(dest_dir=dest_dir)
+                        local_dist.save_about_and_notice_files(
+                            dest_dir=dest_dir)
                         local_dist.fetch_license_files(dest_dir=dest_dir)
                         continue
 
@@ -2535,7 +2581,8 @@ def call(args):
     Call args in a subprocess and display output on the fly.
     Return or raise stdout, stderr, returncode
     """
-    if TRACE: print('Calling:', ' '.join(args))
+    if TRACE:
+        print('Calling:', ' '.join(args))
     with subprocess.Popen(
         args,
         stdout=subprocess.PIPE,
@@ -2547,7 +2594,8 @@ def call(args):
             line = process.stdout.readline()
             if not line and process.poll() is not None:
                 break
-            if TRACE: print(line.rstrip(), flush=True)
+            if TRACE:
+                print(line.rstrip(), flush=True)
 
         stdout, stderr = process.communicate()
         returncode = process.returncode
@@ -2587,8 +2635,10 @@ def add_or_upgrade_built_wheels(
     # a mapping of {req specifier: {mapping build_wheels kwargs}}
     wheels_to_build = {}
     for python_version, operating_system in itertools.product(python_versions, operating_systems):
-        print(f'  Adding wheels for package: {name}{ver} on {python_version,} and {operating_system}')
-        environment = Environment.from_pyver_and_os(python_version, operating_system)
+        print(
+            f'  Adding wheels for package: {name}{ver} on {python_version,} and {operating_system}')
+        environment = Environment.from_pyver_and_os(
+            python_version, operating_system)
 
         # Check if requested wheel already exists locally for this version
         local_repo = get_local_repo(directory=dest_dir)
@@ -2716,10 +2766,10 @@ def build_wheels_remotely_on_multiple_platforms(
         '--artifact-paths', '*.whl',
         '--artifact', 'artifacts.tar.gz',
         '--command',
-            # create a virtualenv, upgrade pip
-#            f'python -m ensurepip --user --upgrade; '
-            f'python -m pip {verbose} install  --user --upgrade pip setuptools wheel; '
-            f'python -m pip {verbose} wheel {deps} {requirements_specifier}',
+        # create a virtualenv, upgrade pip
+        #            f'python -m ensurepip --user --upgrade; '
+        f'python -m pip {verbose} install  --user --upgrade pip setuptools wheel; '
+        f'python -m pip {verbose} wheel {deps} {requirements_specifier}',
     ])
 
     if verbose:
@@ -2752,7 +2802,7 @@ def get_romp_pyos_options(
         ('--version', ver) for ver in python_dot_versions))
 
     pyos_options += list(itertools.chain.from_iterable(
-        ('--platform' , plat) for plat in sorted(set(operating_systems))))
+        ('--platform', plat) for plat in sorted(set(operating_systems))))
 
     return pyos_options
 
@@ -2841,7 +2891,7 @@ def optimize_wheel(wheel_filename, dest_dir=THIRDPARTY_DIR):
         'auditwheel',
         'addtag',
         '--wheel-dir', wheel_dir,
-       original_wheel_loc
+        original_wheel_loc
     ]
     call(awargs)
 
@@ -2863,8 +2913,10 @@ def optimize_wheel(wheel_filename, dest_dir=THIRDPARTY_DIR):
         return wheel_filename
 
     new_wheel = Wheel.from_filename(new_wheel_name)
-    non_pypi_plats = utils_pypi_supported_tags.validate_platforms_for_pypi(new_wheel.platforms)
-    new_wheel.platforms = [p for p in new_wheel.platforms if p not in non_pypi_plats]
+    non_pypi_plats = utils_pypi_supported_tags.validate_platforms_for_pypi(
+        new_wheel.platforms)
+    new_wheel.platforms = [
+        p for p in new_wheel.platforms if p not in non_pypi_plats]
     if not new_wheel.platforms:
         print(f'Cannot make wheel PyPI compatible: {original_wheel_loc}')
         os.rename(new_wheel_loc, original_wheel_loc)
@@ -2942,7 +2994,8 @@ def find_problems(
 
         for dist in package.get_distributions():
             dist.load_about_data(dest_dir=dest_dir)
-            abpth = os.path.abspath(os.path.join(dest_dir, dist.about_filename))
+            abpth = os.path.abspath(os.path.join(
+                dest_dir, dist.about_filename))
             if not dist.has_key_metadata():
                 print(f'   Missing key ABOUT data in file://{abpth}')
             if 'classifiers' in dist.extra_data:
