@@ -5,7 +5,7 @@
 # ScanCode is a trademark of nexB Inc.
 # SPDX-License-Identifier: Apache-2.0
 # See http://www.apache.org/licenses/LICENSE-2.0 for the license text.
-# See https://github.com/aboutcode-org/skeleton for support or download.
+# See https://github.com/nexB/skeleton for support or download.
 # See https://aboutcode.org for more information about nexB OSS projects.
 #
 import click
@@ -14,54 +14,54 @@ import utils_thirdparty
 
 
 @click.command()
+
 @click.option('-n', '--name',
-              type=str,
-              metavar='PACKAGE_NAME',
-              required=True,
-              help='Python package name to add or build.',
-              )
+    type=str,
+    metavar='PACKAGE_NAME',
+    required=True,
+    help='Python package name to add or build.',
+)
 @click.option('-v', '--version',
-              type=str,
-              default=None,
-              metavar='VERSION',
-              help='Python package version to add or build.',
-              )
+    type=str,
+    default=None,
+    metavar='VERSION',
+    help='Python package version to add or build.',
+)
 @click.option('-d', '--thirdparty-dir',
-              type=click.Path(exists=True, readable=True,
-                              path_type=str, file_okay=False),
-              metavar='DIR',
-              default=utils_thirdparty.THIRDPARTY_DIR,
-              show_default=True,
-              help='Path to the thirdparty directory where wheels are built.',
-              )
+    type=click.Path(exists=True, readable=True, path_type=str, file_okay=False),
+    metavar='DIR',
+    default=utils_thirdparty.THIRDPARTY_DIR,
+    show_default=True,
+    help='Path to the thirdparty directory where wheels are built.',
+)
 @click.option('-p', '--python-version',
-              type=click.Choice(utils_thirdparty.PYTHON_VERSIONS),
-              metavar='PYVER',
-              default=utils_thirdparty.PYTHON_VERSIONS,
-              show_default=True,
-              multiple=True,
-              help='Python version to use for this build.',
-              )
+    type=click.Choice(utils_thirdparty.PYTHON_VERSIONS),
+    metavar='PYVER',
+    default=utils_thirdparty.PYTHON_VERSIONS,
+    show_default=True,
+    multiple=True,
+    help='Python version to use for this build.',
+)
 @click.option('-o', '--operating-system',
-              type=click.Choice(utils_thirdparty.PLATFORMS_BY_OS),
-              metavar='OS',
-              default=tuple(utils_thirdparty.PLATFORMS_BY_OS),
-              multiple=True,
-              show_default=True,
-              help='OS to use for this build: one of linux, mac or windows.',
-              )
+    type=click.Choice(utils_thirdparty.PLATFORMS_BY_OS),
+    metavar='OS',
+    default=tuple(utils_thirdparty.PLATFORMS_BY_OS),
+    multiple=True,
+    show_default=True,
+    help='OS to use for this build: one of linux, mac or windows.',
+)
 @click.option('--build-remotely',
-              is_flag=True,
-              help='Build missing wheels remotely.',
-              )
+    is_flag=True,
+    help='Build missing wheels remotely.',
+)
 @click.option('--with-deps',
-              is_flag=True,
-              help='Also include all dependent wheels.',
-              )
+    is_flag=True,
+    help='Also include all dependent wheels.',
+)
 @click.option('--verbose',
-              is_flag=True,
-              help='Provide verbose output.',
-              )
+    is_flag=True,
+    help='Provide verbose output.',
+)
 @click.help_option('-h', '--help')
 def build_wheels(
     name,
